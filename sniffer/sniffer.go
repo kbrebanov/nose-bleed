@@ -24,8 +24,11 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
         packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
         for packet := range packetSource.Packets() {
                 headers := parser.Parse(packet)
-                //b, _ := json.Marshal(headers)
-                b, _ := json.MarshalIndent(headers, "", "  ")
+                //b, err := json.Marshal(headers)
+                b, err := json.MarshalIndent(headers, "", "  ")
+                if err != nil {
+                        panic(err)
+                }
                 fmt.Println(string(b))
                 fmt.Println()
         }

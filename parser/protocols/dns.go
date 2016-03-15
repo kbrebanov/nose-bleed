@@ -68,5 +68,6 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
                 TotalAuthorityRRS: dnsTotalAuthorityRRS,
                 TotalAdditionalRRS: dnsTotalAdditionalRRS,
         }
+        
         return dnsHeader
 }

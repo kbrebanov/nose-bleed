@@ -15,6 +15,7 @@ type ICMPv4Header struct {
 
 func ICMPv4Parser(layer gopacket.Layer) ICMPv4Header {
         icmp, _ := layer.(*layers.ICMPv4)
+
         icmpv4Header := ICMPv4Header{
                 Type: int(icmp.TypeCode.Type()),
                 Code: int(icmp.TypeCode.Code()),
@@ -22,5 +23,6 @@ func ICMPv4Parser(layer gopacket.Layer) ICMPv4Header {
                 Identification: int(icmp.Id),
                 SequenceNumber: int(icmp.Seq),
         }
+        
         return icmpv4Header
 }

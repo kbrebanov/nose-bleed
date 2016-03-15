@@ -1,16 +1,13 @@
 package parser
 
 import (
-        "encoding/json"
-        "fmt"
-
         "github.com/kbrebanov/nose-bleed/parser/protocols"
 
         "github.com/google/gopacket"
         "github.com/google/gopacket/layers"
 )
 
-func Parse(packet gopacket.Packet) {
+func Parse(packet gopacket.Packet) map[string]interface{} {
         packetHeaders := make(map[string]interface{})
 
         metaData := packet.Metadata()
@@ -54,8 +51,5 @@ func Parse(packet gopacket.Packet) {
                 packetHeaders["dns"] = protocols.DNSParser(dnsLayer)
         }
 
-        //b, _ := json.Marshal(packetHeaders)
-        b, _ := json.MarshalIndent(packetHeaders, "", "  ")
-        fmt.Println(string(b))
-        fmt.Println()
+        return packetHeaders
 }

@@ -62,5 +62,6 @@ func TCPParser(layer gopacket.Layer) TCPHeader {
                 Checksum: int(tcp.Checksum),
                 Urgent: int(tcp.Urgent),
         }
+        
         return tcpHeader
 }

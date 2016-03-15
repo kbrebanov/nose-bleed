@@ -14,11 +14,13 @@ type UDPHeader struct {
 
 func UDPParser(layer gopacket.Layer) UDPHeader {
         udp, _ := layer.(*layers.UDP)
+
         udpHeader := UDPHeader{
                 SourcePort: int(udp.SrcPort),
                 DestPort: int(udp.DstPort),
                 Length: int(udp.Length),
                 Checksum: int(udp.Checksum),
         }
+        
         return udpHeader
 }

@@ -14,11 +14,13 @@ type EthernetHeader struct {
 
 func EthernetParser(layer gopacket.Layer) EthernetHeader {
         ethernet, _ := layer.(*layers.Ethernet)
+
         ethernetHeader := EthernetHeader{
                 SourceAddress: ethernet.SrcMAC.String(),
                 DestAddress: ethernet.DstMAC.String(),
                 Type: ethernet.EthernetType.String(),
                 Length: int(ethernet.Length),
         }
+        
         return ethernetHeader
 }

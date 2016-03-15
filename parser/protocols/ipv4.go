@@ -50,5 +50,6 @@ func IPv4Parser(layer gopacket.Layer) IPv4Header {
                 SourceAddress: ip.SrcIP.String(),
                 DestAddress: ip.DstIP.String(),
         }
+        
         return ipv4Header
 }

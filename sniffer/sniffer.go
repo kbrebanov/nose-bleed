@@ -1,6 +1,8 @@
 package sniffer
 
 import (
+        "encoding/json"
+        "fmt"
         "log"
         "time"
 
@@ -21,6 +23,10 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
         // Parse each packet
         packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
         for packet := range packetSource.Packets() {
-                parser.Parse(packet)
+                headers := parser.Parse(packet)
+                //b, _ := json.Marshal(headers)
+                b, _ := json.MarshalIndent(headers, "", "  ")
+                fmt.Println(string(b))
+                fmt.Println()
         }
 }

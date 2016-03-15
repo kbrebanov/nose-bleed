@@ -3,12 +3,14 @@ package protocols
 import (
         "github.com/google/gopacket"
         "github.com/google/gopacket/layers"
-        //"github.com/miekg/dns"
+        "github.com/miekg/dns"
 )
 
 type DNSHeader struct {
         ID int                        `json:"id"`
+        Opcode string                 `json:"opcode"`
         Flags []string                `json:"flags"`
+        Rcode string                  `json:"rcode"`
         TotalQuestions int            `json:"total_questions"`
         TotalAnswerRRS int            `json:"total_answer_rrs"`
         TotalAuthorityRRS int         `json:"total_authority_rrs"`
@@ -18,36 +20,53 @@ type DNSHeader struct {
 func DNSParser(layer gopacket.Layer) DNSHeader {
         dnsFlags := make([]string, 0, 8)
 
-        dns, _ := layer.(*layers.DNS)
+        dnsLayer, _ := layer.(*layers.DNS)
 
-        //dnsFlags = append(dnsFlags, dns.OpCode.String())
-        dnsFlags = append(dnsFlags, dns.ResponseCode.String())
-        if dns.QR {
+        contents := dnsLayer.BaseLayer.LayerContents()
+        //payload := dnsLayer.BaseLayer.LayerPayload()
+
+        dnsMsg := new(dns.Msg)
+        dnsMsg.Unpack(contents)
+
+        if ! dnsMsg.MsgHdr.Response {
                 dnsFlags = append(dnsFlags, "QR")
         }
-        if dns.AA {
+        if dnsMsg.MsgHdr.Authoritative {
                 dnsFlags = append(dnsFlags, "AA")
         }
-        if dns.TC {
+        if dnsMsg.MsgHdr.Truncated {
                 dnsFlags = append(dnsFlags, "TC")
         }
-        if dns.RD {
+        if dnsMsg.MsgHdr.RecursionDesired {
                 dnsFlags = append(dnsFlags, "RD")
         }
-        if dns.RA {
+        if dnsMsg.MsgHdr.RecursionAvailable {
                 dnsFlags = append(dnsFlags, "RA")
         }
-        //if dns.Z {
-        //        dnsFlags = append(dnsFlags, "Z")
-        //}
+        if dnsMsg.MsgHdr.Zero {
+                dnsFlags = append(dnsFlags, "Z")
+        }
+        if dnsMsg.MsgHdr.AuthenticatedData {
+                dnsFlags = append(dnsFlags, "AD")
+        }
+        if dnsMsg.MsgHdr.CheckingDisabled {
+                dnsFlags = append(dnsFlags, "CD")
+        }
+
+        dnsTotalQuestions := len(dnsMsg.Question)
+        dnsTotalAnswerRRS := len(dnsMsg.Answer)
+        dnsTotalAuthorityRRS := len(dnsMsg.Ns)
+        dnsTotalAdditionalRRS := len(dnsMsg.Extra)
 
         dnsHeader := DNSHeader {
-                ID: int(dns.ID),
+                ID: int(dnsMsg.MsgHdr.Id),
+                Opcode: dns.OpcodeToString[dnsMsg.MsgHdr.Opcode],
                 Flags: dnsFlags,
-                TotalQuestions: len(dns.Questions),
-                TotalAnswerRRS: len(dns.Answers),
-                TotalAuthorityRRS: len(dns.Authorities),
-                TotalAdditionalRRS: len(dns.Additionals),
+                Rcode: dns.RcodeToString[dnsMsg.MsgHdr.Rcode],
+                TotalQuestions: dnsTotalQuestions,
+                TotalAnswerRRS: dnsTotalAnswerRRS,
+                TotalAuthorityRRS: dnsTotalAuthorityRRS,
+                TotalAdditionalRRS: dnsTotalAdditionalRRS,
         }
         return dnsHeader
 }

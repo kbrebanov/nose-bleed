@@ -12,8 +12,14 @@ func main() {
         snaplen := flag.Int("snaplen", 65535, "Snapshot length")
         promiscuous := flag.Bool("promiscuous", false, "Set promiscuous mode")
         timeout := flag.Duration("timeout", 30 * time.Second, "Timeout")
+        user := flag.String("user", "", "RabbitMQ user")
+        passwd := flag.String("passwd", "", "RabbitMQ password")
+        server := flag.String("server", "", "RabbitMQ server")
+        exchange := flag.String("exchange", "", "RabbitMQ exchange name")
 
         flag.Parse()
 
-        sniffer.Run(*device, int32(*snaplen), *promiscuous, *timeout)
+        // Start sniffing
+        sniffer.Run(*device, int32(*snaplen), *promiscuous, *timeout,
+                    *user, *passwd, *server, *exchange)
 }

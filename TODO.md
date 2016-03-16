@@ -1,0 +1,6 @@
+- Add tests
+- Add comments/docs
+- Improve error handling
+- Support more message brokers other than RabbitMQ
+- Support RabbitMQ TLS connections
+- Support specifying RabbitMQ exchange properties

@@ -19,7 +19,7 @@ import (
 func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Duration,
 	user string, passwd string, server string, exchange string) {
 	var ch *amqp.Channel
-	var USE_RABBITMQ = false
+	useRabbitMQ := false
 
 	// Initialize msg queue
 	if user != "" && passwd != "" && server != "" && exchange != "" {
@@ -34,7 +34,7 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		err = ch.ExchangeDeclare(exchange, "fanout", true, false, false, false, nil)
 		failOnError(err, "Failed to declare an exchange")
 
-		USE_RABBITMQ = true
+		useRabbitMQ = true
 	}
 
 	// Start a live capture
@@ -48,7 +48,7 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
 		headers := parser.Parse(packet)
-		if USE_RABBITMQ {
+		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {
 				panic(err)

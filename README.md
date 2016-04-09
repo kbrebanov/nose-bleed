@@ -51,4 +51,4 @@ To do
 - [ ] Support more message brokers other than RabbitMQ
 - [ ] Support RabbitMQ TLS connections
 - [ ] Support specifying RabbitMQ exchange properties
-- [ ] Support BPFs
+- [x] Support BPFs

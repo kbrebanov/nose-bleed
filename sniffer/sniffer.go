@@ -17,7 +17,7 @@ import (
 // Run starts a live capture of network packets, parses and outputs
 // the JSON results to either standard output or a RabbitMQ exchange.
 func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Duration,
-	user string, passwd string, server string, exchange string) {
+	user string, passwd string, server string, exchange string, filter string) {
 	var ch *amqp.Channel
 	useRabbitMQ := false
 
@@ -43,6 +43,14 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		log.Fatal(err)
 	}
 	defer handle.Close()
+
+	// Set filter
+	if filter != "" {
+		err = handle.SetBPFFilter(filter)
+		if err != nil {
+			//handle error
+		}
+	}
 
 	// Parse each packet
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())

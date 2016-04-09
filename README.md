@@ -42,3 +42,13 @@ Sending to a RabbitMQ exchange
 ```bash
 nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s -user guest -passwd guest -server localhost:5672 -exchange packets
 ```
+
+To do
+=====
+- [ ] Add tests
+- [ ] Add comments/docs
+- [ ] Improve error handling
+- [ ] Support more message brokers other than RabbitMQ
+- [ ] Support RabbitMQ TLS connections
+- [ ] Support specifying RabbitMQ exchange properties
+- [ ] Support BPFs

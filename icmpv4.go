@@ -15,7 +15,7 @@ type ICMPv4Header struct {
 
 // ICMPv4Parser parses an ICMPv4 header
 func ICMPv4Parser(layer gopacket.Layer) ICMPv4Header {
-	icmp, _ := layer.(*layers.ICMPv4)
+	icmp := layer.(*layers.ICMPv4)
 
 	icmpv4Header := ICMPv4Header{
 		Type:           int(icmp.TypeCode.Type()),

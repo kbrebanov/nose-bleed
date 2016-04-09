@@ -45,7 +45,7 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 	if filter != "" {
 		err = handle.SetBPFFilter(filter)
 		if err != nil {
-			//handle error
+			log.Println(err)
 		}
 	}
 
@@ -56,7 +56,8 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {
-				panic(err)
+				log.Println(err)
+				continue
 			}
 			err = ch.Publish(exchange, "", false, false, amqp.Publishing{
 				ContentType: "text/json",
@@ -66,7 +67,8 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		} else {
 			b, err := json.MarshalIndent(headers, "", "  ")
 			if err != nil {
-				panic(err)
+				log.Println(err)
+				continue
 			}
 			fmt.Println(string(b))
 			fmt.Println()

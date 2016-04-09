@@ -14,7 +14,7 @@ type EthernetHeader struct {
 
 // EthernetParser parses an Ethernet frame header
 func EthernetParser(layer gopacket.Layer) EthernetHeader {
-	ethernet, _ := layer.(*layers.Ethernet)
+	ethernet := layer.(*layers.Ethernet)
 
 	ethernetHeader := EthernetHeader{
 		SourceAddress: ethernet.SrcMAC.String(),

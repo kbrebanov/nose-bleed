@@ -70,7 +70,7 @@ func DNSRRParser(rr dns.RR) DNSRRHeader {
 func DNSParser(layer gopacket.Layer) DNSHeader {
 	dnsFlags := make([]string, 0, 8)
 
-	dnsLayer, _ := layer.(*layers.DNS)
+	dnsLayer := layer.(*layers.DNS)
 
 	contents := dnsLayer.BaseLayer.LayerContents()
 

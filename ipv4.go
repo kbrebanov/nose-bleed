@@ -25,7 +25,7 @@ type IPv4Header struct {
 func IPv4Parser(layer gopacket.Layer) IPv4Header {
 	ipv4Flags := make([]string, 0, 3)
 
-	ip, _ := layer.(*layers.IPv4)
+	ip := layer.(*layers.IPv4)
 
 	if ip.Flags == layers.IPv4EvilBit {
 		ipv4Flags = append(ipv4Flags, "EB")

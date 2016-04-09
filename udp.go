@@ -14,7 +14,7 @@ type UDPHeader struct {
 
 // UDPParser parses a UDP datagram header
 func UDPParser(layer gopacket.Layer) UDPHeader {
-	udp, _ := layer.(*layers.UDP)
+	udp := layer.(*layers.UDP)
 
 	udpHeader := UDPHeader{
 		SourcePort: int(udp.SrcPort),

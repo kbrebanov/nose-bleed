@@ -22,7 +22,7 @@ type TCPHeader struct {
 func TCPParser(layer gopacket.Layer) TCPHeader {
 	tcpFlags := make([]string, 0, 9)
 
-	tcp, _ := layer.(*layers.TCP)
+	tcp := layer.(*layers.TCP)
 
 	if tcp.FIN {
 		tcpFlags = append(tcpFlags, "FIN")

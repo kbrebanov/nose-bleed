@@ -77,6 +77,7 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 	dnsMsg := new(dns.Msg)
 	dnsMsg.Unpack(contents)
 
+	// Parse flags
 	if !dnsMsg.MsgHdr.Response {
 		dnsFlags = append(dnsFlags, "QR")
 	}
@@ -112,6 +113,7 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 	dnsAuthorityRRS := make([]interface{}, 0, dnsTotalAuthorityRRS)
 	dnsAdditionalRRS := make([]interface{}, 0, dnsTotalAdditionalRRS)
 
+	// Parse questions
 	for _, question := range dnsMsg.Question {
 		dnsQuestions = append(dnsQuestions, DNSQuestion{
 			Name:   question.Name,
@@ -120,14 +122,17 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 		})
 	}
 
+	// Parse answer resource records
 	for _, answer := range dnsMsg.Answer {
 		dnsAnswerRRS = append(dnsAnswerRRS, DNSRRParser(answer))
 	}
 
+	// Parse authority resource records
 	for _, authority := range dnsMsg.Ns {
 		dnsAuthorityRRS = append(dnsAuthorityRRS, DNSRRParser(authority))
 	}
 
+	// Parse additional resource records
 	for _, additional := range dnsMsg.Extra {
 		dnsAdditionalRRS = append(dnsAdditionalRRS, DNSRRParser(additional))
 	}

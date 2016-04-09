@@ -13,6 +13,7 @@ import (
 const version string = "0.1.0"
 
 func main() {
+	// Set command line flags
 	device := flag.String("device", "eth0", "Device to sniff")
 	snaplen := flag.Int("snaplen", 65535, "Snapshot length")
 	promiscuous := flag.Bool("promiscuous", false, "Set promiscuous mode")
@@ -27,6 +28,7 @@ func main() {
 
 	flag.Parse()
 
+	// Show version and exit if version flag is set
 	if *showVersion {
 		fmt.Println(version)
 		os.Exit(0)

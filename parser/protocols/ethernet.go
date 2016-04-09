@@ -1,3 +1,7 @@
+/*
+Package protocols implements a library of routines for parsing
+different TCP/IP network protocol headers.
+*/
 package protocols
 
 import (

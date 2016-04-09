@@ -1,3 +1,6 @@
+/*
+Package parser implements a library for parsing TCP/IP network packet headers.
+*/
 package parser
 
 import (

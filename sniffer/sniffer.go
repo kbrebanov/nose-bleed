@@ -1,3 +1,6 @@
+/*
+Package sniffer implements a network packet sniffer.
+*/
 package sniffer
 
 import (
@@ -22,17 +25,21 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 
 	// Initialize msg queue
 	if user != "" && passwd != "" && server != "" && exchange != "" {
+		// Open connetion to RabbitMQ
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", user, passwd, server))
 		failOnError(err, "Failed to connect to RabbitMQ")
 		defer conn.Close()
 
+		// Create a channel
 		ch, err = conn.Channel()
 		failOnError(err, "Failed to open a channel")
 		defer ch.Close()
 
+		// Declare an exchange
 		err = ch.ExchangeDeclare(exchange, "fanout", true, false, false, false, nil)
 		failOnError(err, "Failed to declare an exchange")
 
+		// Set the RabbitMQ flag if we got this far
 		useRabbitMQ = true
 	}
 
@@ -59,17 +66,21 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 			b, err := json.Marshal(headers)
 			if err != nil {
 				log.Println(err)
+				// Skip packet if JSON marshalling errors
 				continue
 			}
+			// Send JSON to RabbitMQ exchange
 			err = ch.Publish(exchange, "", false, false, amqp.Publishing{
 				ContentType: "text/json",
 				Body:        b,
 			})
 			failOnError(err, "Failed to publish a message")
 		} else {
+			// Pretty print JSON when sending to standard output
 			b, err := json.MarshalIndent(headers, "", "  ")
 			if err != nil {
 				log.Println(err)
+				// Skip packet if JSON marshalling errors
 				continue
 			}
 			fmt.Println(string(b))

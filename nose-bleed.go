@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/kbrebanov/nose-bleed/sniffer"
 )
 
 const version string = "0.1.0"
@@ -29,6 +31,6 @@ func main() {
 	}
 
 	// Start sniffing
-	Run(*device, int32(*snaplen), *promiscuous, *timeout,
+	sniffer.Run(*device, int32(*snaplen), *promiscuous, *timeout,
 		*user, *passwd, *server, *exchange, *filter)
 }

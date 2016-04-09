@@ -1,10 +1,12 @@
-package main
+package sniffer
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/kbrebanov/nose-bleed/parser"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
@@ -52,7 +54,7 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 	// Parse each packet
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
-		headers := Parse(packet)
+		headers := parser.Parse(packet)
 		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {

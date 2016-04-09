@@ -1,4 +1,4 @@
-package main
+package protocols
 
 import (
 	"strconv"

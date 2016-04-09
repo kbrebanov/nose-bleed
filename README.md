@@ -52,3 +52,4 @@ To do
 - [ ] Support RabbitMQ TLS connections
 - [ ] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
+- [ ] Godeps

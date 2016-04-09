@@ -2,8 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os"
 	"time"
 )
+
+const version string = "0.1.0"
 
 func main() {
 	device := flag.String("device", "eth0", "Device to sniff")
@@ -15,8 +19,14 @@ func main() {
 	server := flag.String("server", "", "RabbitMQ server")
 	exchange := flag.String("exchange", "", "RabbitMQ exchange name")
 	filter := flag.String("filter", "", "Berkley Packet Filter (BPF)")
+	showVersion := flag.Bool("version", false, "Show version")
 
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	// Start sniffing
 	Run(*device, int32(*snaplen), *promiscuous, *timeout,

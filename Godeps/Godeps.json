@@ -1,0 +1,30 @@
+{
+	"ImportPath": "github.com/kbrebanov/nose-bleed",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
+	"Deps": [
+		{
+			"ImportPath": "github.com/google/gopacket",
+			"Comment": "v1.1.11-88-g8cdd14c",
+			"Rev": "8cdd14ca4735e61d81a55f62761fc2c082d41898"
+		},
+		{
+			"ImportPath": "github.com/google/gopacket/layers",
+			"Comment": "v1.1.11-88-g8cdd14c",
+			"Rev": "8cdd14ca4735e61d81a55f62761fc2c082d41898"
+		},
+		{
+			"ImportPath": "github.com/google/gopacket/pcap",
+			"Comment": "v1.1.11-88-g8cdd14c",
+			"Rev": "8cdd14ca4735e61d81a55f62761fc2c082d41898"
+		},
+		{
+			"ImportPath": "github.com/miekg/dns",
+			"Rev": "b9171237b0642de1d8e8004f16869970e065f46b"
+		},
+		{
+			"ImportPath": "github.com/streadway/amqp",
+			"Rev": "2e25825abdbd7752ff08b270d313b93519a0a232"
+		}
+	]
+}

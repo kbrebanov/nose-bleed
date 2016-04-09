@@ -21,9 +21,19 @@ It currently parses the following:
 Dependencies
 ============
 
+```bash
+go get github.com/tools/godep
+
+cd $GOPATH/src/github.com/kbrebanov/nose-bleed
+godep restore
 ```
-go get github.com/google/gopacket
-go get github.com/streadway/amqp
+
+Build
+=====
+
+```bash
+cd $GOPATH/src/github.com/kbrebanov/nose-bleed
+go build
 ```
 
 Usage
@@ -52,4 +62,4 @@ To do
 - [ ] Support RabbitMQ TLS connections
 - [ ] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
-- [ ] Godeps
+- [x] Godeps

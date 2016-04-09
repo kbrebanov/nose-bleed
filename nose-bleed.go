@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"time"
-
-	"github.com/kbrebanov/nose-bleed/sniffer"
 )
 
 func main() {
@@ -21,6 +19,6 @@ func main() {
 	flag.Parse()
 
 	// Start sniffing
-	sniffer.Run(*device, int32(*snaplen), *promiscuous, *timeout,
+	Run(*device, int32(*snaplen), *promiscuous, *timeout,
 		*user, *passwd, *server, *exchange, *filter)
 }

@@ -82,6 +82,5 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
-		panic(fmt.Sprintf("%s: %s", msg, err))
 	}
 }

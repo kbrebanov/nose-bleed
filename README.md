@@ -63,3 +63,6 @@ To do
 - [ ] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
 - [x] Godeps
+- [ ] Handle IPv4 options
+- [ ] Handle TCP options
+- [ ] Support IPv6

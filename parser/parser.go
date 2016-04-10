@@ -11,7 +11,7 @@ import (
 )
 
 // Parse parses a packet header.
-func Parse(packet gopacket.Packet) map[string]interface{} {
+func Parse(packet gopacket.Packet) (map[string]interface{}, error) {
 	packetHeaders := make(map[string]interface{})
 
 	metaData := packet.Metadata()
@@ -52,8 +52,12 @@ func Parse(packet gopacket.Packet) map[string]interface{} {
 	// If this packet has a DNS payload, include it's data
 	dnsLayer := packet.Layer(layers.LayerTypeDNS)
 	if dnsLayer != nil {
-		packetHeaders["dns"] = protocols.DNSParser(dnsLayer)
+		dns, err := protocols.DNSParser(dnsLayer)
+		if err != nil {
+			return nil, err
+		}
+		packetHeaders["dns"] = dns
 	}
 
-	return packetHeaders
+	return packetHeaders, nil
 }

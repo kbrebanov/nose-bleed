@@ -61,7 +61,13 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 	// Parse each packet
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
-		headers := parser.Parse(packet)
+		headers, err := parser.Parse(packet)
+		if err != nil {
+			log.Println(err)
+			// Skip packet if parsing errors
+			continue
+		}
+
 		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {

@@ -40,19 +40,41 @@ type DNSRRHeader struct {
 }
 
 // DNSRRParser parses DNS Resource Records
-func DNSRRParser(rr dns.RR) DNSRRHeader {
-	rrHeader := strings.Split(rr.String(), "\t")
-	name := strings.TrimPrefix(rrHeader[0], ";")
-	rrType := rrHeader[3]
-	class := rrHeader[2]
-	rdLength := int(rr.Header().Rdlength)
+func DNSRRParser(rr dns.RR) (DNSRRHeader, error) {
+	var (
+		name, rrType, class, rdata string
+		ttl, rdLength              int
+	)
 
-	ttl, err := strconv.Atoi(rrHeader[1])
-	if err != nil {
-		//handle error
+	// Get string representation of RR header and split it on tabs
+	rrHeader := strings.Split(rr.String(), "\t")
+
+	// Extract respective fields from RR header
+	headerLen := len(rrHeader)
+	switch {
+	case headerLen >= 1:
+		name = strings.TrimPrefix(rrHeader[0], ";")
+		fallthrough
+	case headerLen >= 2:
+		var err error
+
+		ttl, err = strconv.Atoi(rrHeader[1])
+		if err != nil {
+			return DNSRRHeader{}, err
+		}
+
+		fallthrough
+	case headerLen >= 3:
+		class = rrHeader[2]
+		fallthrough
+	case headerLen >= 4:
+		rrType = rrHeader[3]
+		fallthrough
+	case headerLen >= 5:
+		rdata = strings.Join(rrHeader[4:], " ")
 	}
 
-	rdata := strings.Join(rrHeader[4:], " ")
+	rdLength = int(rr.Header().Rdlength)
 
 	header := DNSRRHeader{
 		Name:     name,
@@ -63,11 +85,11 @@ func DNSRRParser(rr dns.RR) DNSRRHeader {
 		Rdata:    rdata,
 	}
 
-	return header
+	return header, nil
 }
 
 // DNSParser parses a DNS header
-func DNSParser(layer gopacket.Layer) DNSHeader {
+func DNSParser(layer gopacket.Layer) (DNSHeader, error) {
 	dnsFlags := make([]string, 0, 8)
 
 	dnsLayer := layer.(*layers.DNS)
@@ -75,7 +97,9 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 	contents := dnsLayer.BaseLayer.LayerContents()
 
 	dnsMsg := new(dns.Msg)
-	dnsMsg.Unpack(contents)
+	if err := dnsMsg.Unpack(contents); err != nil {
+		return DNSHeader{}, err
+	}
 
 	// Parse flags
 	if !dnsMsg.MsgHdr.Response {
@@ -124,17 +148,29 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 
 	// Parse answer resource records
 	for _, answer := range dnsMsg.Answer {
-		dnsAnswerRRS = append(dnsAnswerRRS, DNSRRParser(answer))
+		rr, err := DNSRRParser(answer)
+		if err != nil {
+			return DNSHeader{}, err
+		}
+		dnsAnswerRRS = append(dnsAnswerRRS, rr)
 	}
 
 	// Parse authority resource records
 	for _, authority := range dnsMsg.Ns {
-		dnsAuthorityRRS = append(dnsAuthorityRRS, DNSRRParser(authority))
+		rr, err := DNSRRParser(authority)
+		if err != nil {
+			return DNSHeader{}, err
+		}
+		dnsAuthorityRRS = append(dnsAuthorityRRS, rr)
 	}
 
 	// Parse additional resource records
 	for _, additional := range dnsMsg.Extra {
-		dnsAdditionalRRS = append(dnsAdditionalRRS, DNSRRParser(additional))
+		rr, err := DNSRRParser(additional)
+		if err != nil {
+			return DNSHeader{}, err
+		}
+		dnsAdditionalRRS = append(dnsAdditionalRRS, rr)
 	}
 
 	dnsHeader := DNSHeader{
@@ -152,5 +188,5 @@ func DNSParser(layer gopacket.Layer) DNSHeader {
 		AdditionalRRS:      dnsAdditionalRRS,
 	}
 
-	return dnsHeader
+	return dnsHeader, nil
 }

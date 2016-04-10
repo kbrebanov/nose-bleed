@@ -21,6 +21,8 @@ It currently parses the following:
 Dependencies
 ============
 
+- libpcap-dev
+
 ```bash
 go get github.com/tools/godep
 

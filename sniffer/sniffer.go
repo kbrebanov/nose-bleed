@@ -64,8 +64,6 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		headers, err := parser.Parse(packet)
 		if err != nil {
 			log.Println(err)
-			// Skip packet if parsing errors
-			continue
 		}
 
 		if useRabbitMQ {

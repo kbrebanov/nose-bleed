@@ -148,29 +148,44 @@ func DNSParser(layer gopacket.Layer) (DNSHeader, error) {
 
 	// Parse answer resource records
 	for _, answer := range dnsMsg.Answer {
-		rr, err := DNSRRParser(answer)
-		if err != nil {
-			return DNSHeader{}, err
+		switch answer := answer.(type) {
+		case *dns.OPT: // Skip OPT RRs
+			continue
+		default:
+			rr, err := DNSRRParser(answer)
+			if err != nil {
+				return DNSHeader{}, err
+			}
+			dnsAnswerRRS = append(dnsAnswerRRS, rr)
 		}
-		dnsAnswerRRS = append(dnsAnswerRRS, rr)
 	}
 
 	// Parse authority resource records
 	for _, authority := range dnsMsg.Ns {
-		rr, err := DNSRRParser(authority)
-		if err != nil {
-			return DNSHeader{}, err
+		switch authority := authority.(type) {
+		case *dns.OPT: // Skip OPT RRs
+			continue
+		default:
+			rr, err := DNSRRParser(authority)
+			if err != nil {
+				return DNSHeader{}, err
+			}
+			dnsAuthorityRRS = append(dnsAuthorityRRS, rr)
 		}
-		dnsAuthorityRRS = append(dnsAuthorityRRS, rr)
 	}
 
 	// Parse additional resource records
 	for _, additional := range dnsMsg.Extra {
-		rr, err := DNSRRParser(additional)
-		if err != nil {
-			return DNSHeader{}, err
+		switch additional := additional.(type) {
+		case *dns.OPT: // Skip OPT RRs
+			continue
+		default:
+			rr, err := DNSRRParser(additional)
+			if err != nil {
+				return DNSHeader{}, err
+			}
+			dnsAdditionalRRS = append(dnsAdditionalRRS, rr)
 		}
-		dnsAdditionalRRS = append(dnsAdditionalRRS, rr)
 	}
 
 	dnsHeader := DNSHeader{

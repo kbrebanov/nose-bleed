@@ -19,12 +19,13 @@ import (
 // Run starts a live capture of network packets, parses and outputs
 // the JSON results to either standard output or a RabbitMQ exchange.
 func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Duration,
-	user string, passwd string, server string, exchange string, filter string) {
+	user string, passwd string, server string, exchange string, exchangeType string,
+	filter string) {
 	var ch *amqp.Channel
 	useRabbitMQ := false
 
 	// Initialize msg queue
-	if user != "" && passwd != "" && server != "" && exchange != "" {
+	if user != "" && passwd != "" && server != "" && exchange != "" && exchangeType != "" {
 		// Open connetion to RabbitMQ
 		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", user, passwd, server))
 		failOnError(err, "Failed to connect to RabbitMQ")
@@ -36,7 +37,7 @@ func Run(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Du
 		defer ch.Close()
 
 		// Declare an exchange
-		err = ch.ExchangeDeclare(exchange, "fanout", true, false, false, false, nil)
+		err = ch.ExchangeDeclare(exchange, exchangeType, true, false, false, false, nil)
 		failOnError(err, "Failed to declare an exchange")
 
 		// Set the RabbitMQ flag if we got this far

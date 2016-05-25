@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -12,19 +14,29 @@ import (
 
 const version string = "0.1.0"
 
+type RabbitMQSettings struct {
+	User         string  `json:"user"`
+	Password     string  `json:"password"`
+	Host         string  `json:"host"`
+	Port         float64 `json:"port"`
+	Exchange     string  `json:"exchange"`
+	ExchangeType string  `json:"exchange_type"`
+}
+
+type Settings struct {
+	RabbitMQ RabbitMQSettings `json:"rabbitmq,omitempty"`
+}
+
 func main() {
 	// Set command line flags
 	device := flag.String("device", "eth0", "Device to sniff")
 	snaplen := flag.Int("snaplen", 65535, "Snapshot length")
 	promiscuous := flag.Bool("promiscuous", false, "Set promiscuous mode")
 	timeout := flag.Duration("timeout", 30*time.Second, "Timeout")
-	user := flag.String("user", "", "RabbitMQ user")
-	passwd := flag.String("passwd", "", "RabbitMQ password")
-	server := flag.String("server", "", "RabbitMQ server")
-	exchange := flag.String("exchange", "", "RabbitMQ exchange name")
 	filter := flag.String("filter", "", "Berkley Packet Filter (BPF)")
 	showVersion := flag.Bool("version", false, "Show version")
 	logFilePath := flag.String("log", "./nose-bleed.log", "Path to log file")
+	configPath := flag.String("config", "settings.json", "Path to configuration file")
 
 	flag.Parse()
 
@@ -43,7 +55,20 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 
+	// Get settings
+	var settings Settings
+	s, err := ioutil.ReadFile(*configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := json.Unmarshal(s, &settings); err != nil {
+		log.Fatal(err)
+	}
+
 	// Start sniffing
 	sniffer.Run(*device, int32(*snaplen), *promiscuous, *timeout,
-		*user, *passwd, *server, *exchange, *filter)
+		settings.RabbitMQ.User, settings.RabbitMQ.Password,
+		fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, int(settings.RabbitMQ.Port)),
+		settings.RabbitMQ.Exchange, settings.RabbitMQ.ExchangeType, *filter)
 }

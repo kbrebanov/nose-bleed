@@ -50,9 +50,11 @@ nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s
 
 Sending to a RabbitMQ exchange
 
-(as root)
+1. Configure RabbitMQ settings in configuration file (defaults to settings.json in the same directory).
+
+2. (as root)
 ```bash
-nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s -user guest -passwd guest -server localhost:5672 -exchange packets
+nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s
 ```
 
 To do

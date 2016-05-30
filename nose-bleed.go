@@ -43,9 +43,16 @@ func failOnError(err error, msg string) {
 // sniff starts a live capture of network packets, parses and outputs
 // the JSON results to either standard output or a RabbitMQ exchange.
 func sniff(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Duration,
-	filter string, useRabbitMQ bool, settings *Settings) {
+	filter string, settings *Settings) {
 
 	var ch *amqp.Channel
+
+	useRabbitMQ := false
+
+	if settings.RabbitMQ.User != "" && settings.RabbitMQ.Password != "" && settings.RabbitMQ.Host != "" &&
+		settings.RabbitMQ.Exchange != "" && settings.RabbitMQ.ExchangeType != "" {
+		useRabbitMQ = true
+	}
 
 	// Initialize msg queue
 	if useRabbitMQ {
@@ -154,14 +161,7 @@ func main() {
 		}
 	}
 
-	useRabbitMQ := false
-
-	if settings.RabbitMQ.User != "" && settings.RabbitMQ.Password != "" && settings.RabbitMQ.Host != "" &&
-		settings.RabbitMQ.Exchange != "" && settings.RabbitMQ.ExchangeType != "" {
-		useRabbitMQ = true
-	}
-
 	// Start sniffing
-	sniff(*device, int32(*snaplen), *promiscuous, *timeout, *filter, useRabbitMQ, settings)
+	sniff(*device, int32(*snaplen), *promiscuous, *timeout, *filter, settings)
 
 }

@@ -42,7 +42,7 @@ func failOnError(err error, msg string) {
 
 // sniff starts a live capture of network packets, parses and outputs
 // the JSON results to either standard output or a RabbitMQ exchange.
-func sniff(deviceName string, snapshotLen int32, promiscuous bool, timeout time.Duration,
+func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Duration,
 	filter string, settings *Settings) {
 
 	var ch *amqp.Channel
@@ -71,7 +71,7 @@ func sniff(deviceName string, snapshotLen int32, promiscuous bool, timeout time.
 	}
 
 	// Start a live capture
-	handle, err := pcap.OpenLive(deviceName, snapshotLen, promiscuous, timeout)
+	handle, err := pcap.OpenLive(deviceName, int32(snapshotLen), promiscuous, timeout)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -162,6 +162,6 @@ func main() {
 	}
 
 	// Start sniffing
-	sniff(*device, int32(*snaplen), *promiscuous, *timeout, *filter, settings)
+	sniff(*device, *snaplen, *promiscuous, *timeout, *filter, settings)
 
 }

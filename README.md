@@ -45,16 +45,28 @@ Sending to standard output
 
 (as root)
 ```bash
-nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s
+nose-bleed -device eth0 -snaplen 65535 -timeout 10s
 ```
 
 Sending to a RabbitMQ exchange
 
-1. Configure RabbitMQ settings in configuration file (defaults to settings.json in the same directory).
+1. Configure RabbitMQ settings in configuration file.
+```json
+{
+  "rabbitmq": {
+    "user": "guest",
+    "password": "guest",
+    "host": "localhost",
+    "port": 5672,
+    "exchange": "sniffer",
+    "exchange_type": "fanout"
+  }
+}
+```
 
 2. (as root)
 ```bash
-nose-bleed -device eth0 -snaplen 65535 -promiscuous -timeout 10s
+nose-bleed -config config.json -device eth0 -snaplen 65535 -timeout 10s
 ```
 
 To do

@@ -4,6 +4,12 @@
     "password": "guest",
     "host": "localhost",
     "port": 5672,
+    "tls": {
+      "enabled": false,
+      "ca_cert_file": "",
+      "cert_file": "",
+      "key_file": ""
+    },
     "exchange": {
       "name": "sniffer",
       "type": "fanout",

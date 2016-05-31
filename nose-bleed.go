@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -16,7 +18,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const version string = "0.2.0"
+const version string = "0.3.0"
 
 // RabbitMQPublishSettings is a structure for RabbitMQ publish settings
 type RabbitMQPublishSettings struct {
@@ -35,12 +37,21 @@ type RabbitMQExchangeSettings struct {
 	NoWait     bool   `json:"no_wait"`
 }
 
+// RabbitMQTLSSettings is a structure for RabbitMQ TLS settings
+type RabbitMQTLSSettings struct {
+	Enabled    bool   `json:"enabled"`
+	CACertFile string `json:"ca_cert_file"`
+	CertFile   string `json:"cert_file"`
+	KeyFile    string `json:"key_file"`
+}
+
 // RabbitMQSettings is a structure for RabbitMQ settings
 type RabbitMQSettings struct {
 	User     string                   `json:"user"`
 	Password string                   `json:"password"`
 	Host     string                   `json:"host"`
 	Port     int                      `json:"port"`
+	TLS      RabbitMQTLSSettings      `json:"tls"`
 	Exchange RabbitMQExchangeSettings `json:"exchange"`
 	Publish  RabbitMQPublishSettings  `json:"publish"`
 }
@@ -63,6 +74,7 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	filter string, settings *Settings) {
 
 	var ch *amqp.Channel
+	var conn *amqp.Connection
 
 	useRabbitMQ := false
 
@@ -73,13 +85,39 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 
 	// Initialize msg queue
 	if useRabbitMQ {
-		conn, err := amqp.Dial(
-			fmt.Sprintf("amqp://%s:%s@%s/",
-				settings.RabbitMQ.User,
-				settings.RabbitMQ.Password,
-				fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)))
-		failOnError(err, "Failed to connect to RabbitMQ")
-		defer conn.Close()
+		if settings.RabbitMQ.TLS.Enabled {
+			tlsConfig := new(tls.Config)
+			tlsConfig.RootCAs = x509.NewCertPool()
+
+			if ca, err := ioutil.ReadFile(settings.RabbitMQ.TLS.CACertFile); err == nil {
+				tlsConfig.RootCAs.AppendCertsFromPEM(ca)
+			}
+
+			if cert, err := tls.LoadX509KeyPair(settings.RabbitMQ.TLS.CertFile, settings.RabbitMQ.TLS.KeyFile); err == nil {
+				tlsConfig.Certificates = append(tlsConfig.Certificates, cert)
+			}
+
+			var err error
+			conn, err = amqp.DialTLS(
+				fmt.Sprintf("amqps://%s:%s@%s/",
+					settings.RabbitMQ.User,
+					settings.RabbitMQ.Password,
+					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)),
+				tlsConfig)
+			failOnError(err, "Failed to connect to RabbitMQ using TLS")
+			defer conn.Close()
+		} else {
+			var err error
+			conn, err = amqp.Dial(
+				fmt.Sprintf("amqp://%s:%s@%s/",
+					settings.RabbitMQ.User,
+					settings.RabbitMQ.Password,
+					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)))
+			failOnError(err, "Failed to connect to RabbitMQ")
+			defer conn.Close()
+		}
+
+		var err error
 
 		// Create a channel
 		ch, err = conn.Channel()

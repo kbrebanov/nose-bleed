@@ -58,6 +58,12 @@ Sending to a RabbitMQ exchange
     "password": "guest",
     "host": "localhost",
     "port": 5672,
+    "tls": {
+      "enabled": false,
+      "ca_cert_file": "",
+      "cert_file": "",
+      "key_file": ""
+    },
     "exchange": {
       "name": "sniffer",
       "type": "fanout",
@@ -86,7 +92,7 @@ To do
 - [ ] Add comments/docs
 - [x] Improve error handling
 - [ ] Support more message brokers other than RabbitMQ
-- [ ] Support RabbitMQ TLS connections
+- [x] Support RabbitMQ TLS connections
 - [x] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
 - [x] Godeps

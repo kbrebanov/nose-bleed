@@ -16,16 +16,33 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const version string = "0.1.0"
+const version string = "0.2.0"
+
+// RabbitMQPublishSettings is a structure for RabbitMQ publish settings
+type RabbitMQPublishSettings struct {
+	Key       string `json:"key"`
+	Mandatory bool   `json:"mandatory"`
+	Immediate bool   `json:"immediate"`
+}
+
+// RabbitMQExchangeSettings is a structure for RabbitMQ exchange settings
+type RabbitMQExchangeSettings struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Durable    bool   `json:"durable"`
+	AutoDelete bool   `json:"auto_delete"`
+	Internal   bool   `json:"internal"`
+	NoWait     bool   `json:"no_wait"`
+}
 
 // RabbitMQSettings is a structure for RabbitMQ settings
 type RabbitMQSettings struct {
-	User         string `json:"user"`
-	Password     string `json:"password"`
-	Host         string `json:"host"`
-	Port         int    `json:"port"`
-	Exchange     string `json:"exchange"`
-	ExchangeType string `json:"exchange_type"`
+	User     string                   `json:"user"`
+	Password string                   `json:"password"`
+	Host     string                   `json:"host"`
+	Port     int                      `json:"port"`
+	Exchange RabbitMQExchangeSettings `json:"exchange"`
+	Publish  RabbitMQPublishSettings  `json:"publish"`
 }
 
 // Settings is a structure for configuration settings
@@ -50,13 +67,17 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	useRabbitMQ := false
 
 	if settings.RabbitMQ.User != "" && settings.RabbitMQ.Password != "" && settings.RabbitMQ.Host != "" &&
-		settings.RabbitMQ.Exchange != "" && settings.RabbitMQ.ExchangeType != "" {
+		settings.RabbitMQ.Exchange.Name != "" && settings.RabbitMQ.Exchange.Type != "" {
 		useRabbitMQ = true
 	}
 
 	// Initialize msg queue
 	if useRabbitMQ {
-		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", settings.RabbitMQ.User, settings.RabbitMQ.Password, fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)))
+		conn, err := amqp.Dial(
+			fmt.Sprintf("amqp://%s:%s@%s/",
+				settings.RabbitMQ.User,
+				settings.RabbitMQ.Password,
+				fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)))
 		failOnError(err, "Failed to connect to RabbitMQ")
 		defer conn.Close()
 
@@ -66,7 +87,14 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 		defer ch.Close()
 
 		// Declare an exchange
-		err = ch.ExchangeDeclare(settings.RabbitMQ.Exchange, settings.RabbitMQ.ExchangeType, true, false, false, false, nil)
+		err = ch.ExchangeDeclare(
+			settings.RabbitMQ.Exchange.Name,
+			settings.RabbitMQ.Exchange.Type,
+			settings.RabbitMQ.Exchange.Durable,
+			settings.RabbitMQ.Exchange.AutoDelete,
+			settings.RabbitMQ.Exchange.Internal,
+			settings.RabbitMQ.Exchange.NoWait,
+			nil)
 		failOnError(err, "Failed to declare an exchange")
 	}
 
@@ -101,10 +129,15 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 				continue
 			}
 			// Send JSON to RabbitMQ exchange
-			err = ch.Publish(settings.RabbitMQ.Exchange, "", false, false, amqp.Publishing{
-				ContentType: "text/json",
-				Body:        b,
-			})
+			err = ch.Publish(
+				settings.RabbitMQ.Exchange.Name,
+				settings.RabbitMQ.Publish.Key,
+				settings.RabbitMQ.Publish.Mandatory,
+				settings.RabbitMQ.Publish.Immediate,
+				amqp.Publishing{
+					ContentType: "text/json",
+					Body:        b,
+				})
 			failOnError(err, "Failed to publish a message")
 		} else {
 			// Pretty print JSON when sending to standard output

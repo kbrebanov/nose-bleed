@@ -4,7 +4,18 @@
     "password": "guest",
     "host": "localhost",
     "port": 5672,
-    "exchange": "sniffer",
-    "exchange_type": "fanout"
+    "exchange": {
+      "name": "sniffer",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "no_wait": false
+    },
+    "publish": {
+      "key": "",
+      "mandatory": false,
+      "immediate": false
+    }
   }
 }

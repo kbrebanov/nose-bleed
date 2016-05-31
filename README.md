@@ -58,8 +58,19 @@ Sending to a RabbitMQ exchange
     "password": "guest",
     "host": "localhost",
     "port": 5672,
-    "exchange": "sniffer",
-    "exchange_type": "fanout"
+    "exchange": {
+      "name": "sniffer",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "no_wait": false
+    },
+    "publish": {
+      "key": "",
+      "mandatory": false,
+      "immediate": false
+    }
   }
 }
 ```
@@ -76,7 +87,7 @@ To do
 - [x] Improve error handling
 - [ ] Support more message brokers other than RabbitMQ
 - [ ] Support RabbitMQ TLS connections
-- [ ] Support specifying RabbitMQ exchange properties
+- [x] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
 - [x] Godeps
 - [ ] Handle IPv4 options

@@ -13,7 +13,9 @@ It currently parses the following:
 
   - Ethernet
   - ICMPv4
+  - ICMPv6
   - IPv4
+  - IPv6
   - UDP
   - TCP
   - DNS
@@ -96,6 +98,8 @@ To do
 - [x] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
 - [x] Godeps
-- [ ] Handle IPv4 options
-- [ ] Handle TCP options
-- [ ] Support IPv6
+- [ ] Parse IPv4 options
+- [ ] Parse TCP options
+- [x] Support IPv6
+- [ ] Parse ICMPv6 type bytes
+- [ ] Parse IPv6 hop by hop

@@ -31,10 +31,22 @@ func Parse(packet gopacket.Packet) (map[string]interface{}, error) {
 		packetHeaders["icmpv4"] = protocols.ICMPv4Parser(icmpLayer)
 	}
 
+	// It this is an ICMPv6 packet, include it's header
+	icmp6Layer := packet.Layer(layers.LayerTypeICMPv6)
+	if icmp6Layer != nil {
+		packetHeaders["icmpv6"] = protocols.ICMPv6Parser(icmp6Layer)
+	}
+
 	// If this is an IPv4 packet, include it's header
 	ipLayer := packet.Layer(layers.LayerTypeIPv4)
 	if ipLayer != nil {
 		packetHeaders["ipv4"] = protocols.IPv4Parser(ipLayer)
+	}
+
+	// If this is an IPv6 packet, include it's header
+	ip6Layer := packet.Layer(layers.LayerTypeIPv6)
+	if ip6Layer != nil {
+		packetHeaders["ipv6"] = protocols.IPv6Parser(ip6Layer)
 	}
 
 	// If this is a UDP datagram, include it's header

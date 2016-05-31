@@ -73,7 +73,7 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	// Start a live capture
 	handle, err := pcap.OpenLive(deviceName, int32(snapshotLen), promiscuous, timeout)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Failed to start packet capture:", err)
 	}
 	defer handle.Close()
 
@@ -81,7 +81,7 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	if filter != "" {
 		err = handle.SetBPFFilter(filter)
 		if err != nil {
-			log.Println(err)
+			log.Println("Failed to set BPF:", err)
 		}
 	}
 
@@ -90,13 +90,13 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	for packet := range packetSource.Packets() {
 		headers, err := parser.Parse(packet)
 		if err != nil {
-			log.Println(err)
+			log.Println("Failed to parse packet:", err)
 		}
 
 		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {
-				log.Println(err)
+				log.Println("Failed to marshal packet to JSON:", err)
 				// Skip packet if JSON marshalling errors
 				continue
 			}
@@ -110,7 +110,7 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 			// Pretty print JSON when sending to standard output
 			b, err := json.MarshalIndent(headers, "", "  ")
 			if err != nil {
-				log.Println(err)
+				log.Println("Failed to marshal packet to JSON:", err)
 				// Skip packet if JSON marshalling errors
 				continue
 			}
@@ -142,7 +142,7 @@ func main() {
 	// Configure logging
 	logFile, err := os.OpenFile(*logFilePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "Failed to open log file:", err)
 		os.Exit(1)
 	}
 	defer logFile.Close()
@@ -153,11 +153,11 @@ func main() {
 	if *configPath != "" {
 		s, err := ioutil.ReadFile(*configPath)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln("Failed to get settings:", err)
 		}
 
 		if err := json.Unmarshal(s, settings); err != nil {
-			log.Fatal(err)
+			log.Fatalln("Failed to unmarshal JSON settings:", err)
 		}
 	}
 

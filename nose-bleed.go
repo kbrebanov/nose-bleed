@@ -51,6 +51,7 @@ type RabbitMQSettings struct {
 	Password string                   `json:"password"`
 	Host     string                   `json:"host"`
 	Port     int                      `json:"port"`
+	VHost    string                   `json:"vhost"`
 	TLS      RabbitMQTLSSettings      `json:"tls"`
 	Exchange RabbitMQExchangeSettings `json:"exchange"`
 	Publish  RabbitMQPublishSettings  `json:"publish"`
@@ -75,12 +76,19 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 
 	var ch *amqp.Channel
 	var conn *amqp.Connection
+	var vhost string
 
 	useRabbitMQ := false
 
 	if settings.RabbitMQ.User != "" && settings.RabbitMQ.Password != "" && settings.RabbitMQ.Host != "" &&
 		settings.RabbitMQ.Exchange.Name != "" && settings.RabbitMQ.Exchange.Type != "" {
 		useRabbitMQ = true
+	}
+
+	if settings.RabbitMQ.VHost == "" {
+		vhost = "/"
+	} else {
+		vhost = "/" + settings.RabbitMQ.VHost
 	}
 
 	// Initialize msg queue
@@ -99,20 +107,22 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 
 			var err error
 			conn, err = amqp.DialTLS(
-				fmt.Sprintf("amqps://%s:%s@%s/",
+				fmt.Sprintf("amqps://%s:%s@%s%s",
 					settings.RabbitMQ.User,
 					settings.RabbitMQ.Password,
-					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)),
+					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port),
+					vhost),
 				tlsConfig)
 			failOnError(err, "Failed to connect to RabbitMQ using TLS")
 			defer conn.Close()
 		} else {
 			var err error
 			conn, err = amqp.Dial(
-				fmt.Sprintf("amqp://%s:%s@%s/",
+				fmt.Sprintf("amqp://%s:%s@%s%s",
 					settings.RabbitMQ.User,
 					settings.RabbitMQ.Password,
-					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port)))
+					fmt.Sprintf("%s:%d", settings.RabbitMQ.Host, settings.RabbitMQ.Port),
+					vhost))
 			failOnError(err, "Failed to connect to RabbitMQ")
 			defer conn.Close()
 		}

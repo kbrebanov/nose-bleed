@@ -4,6 +4,7 @@
     "password": "guest",
     "host": "localhost",
     "port": 5672,
+    "vhost": "",
     "tls": {
       "enabled": false,
       "ca_cert_file": "",

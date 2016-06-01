@@ -1,9 +1,6 @@
 package protocols
 
-import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-)
+import "github.com/google/gopacket/layers"
 
 type IPv4Header struct {
 	Version        int      `json:"version"`
@@ -22,10 +19,8 @@ type IPv4Header struct {
 }
 
 // IPv4Parser parses an IPv4 packet header
-func IPv4Parser(layer gopacket.Layer) IPv4Header {
+func IPv4Parser(ip layers.IPv4) IPv4Header {
 	ipv4Flags := make([]string, 0, 3)
-
-	ip := layer.(*layers.IPv4)
 
 	if ip.Flags == layers.IPv4EvilBit {
 		ipv4Flags = append(ipv4Flags, "EB")

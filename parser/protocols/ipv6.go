@@ -1,9 +1,6 @@
 package protocols
 
-import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-)
+import "github.com/google/gopacket/layers"
 
 type IPv6Header struct {
 	Version       int    `json:"version"`
@@ -18,8 +15,7 @@ type IPv6Header struct {
 }
 
 // IPv6Parser parses an IPv6 packet header
-func IPv6Parser(layer gopacket.Layer) IPv6Header {
-	ipv6 := layer.(*layers.IPv6)
+func IPv6Parser(ipv6 layers.IPv6) IPv6Header {
 
 	ipv6Header := IPv6Header{
 		Version:       int(ipv6.Version),

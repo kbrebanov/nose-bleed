@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/miekg/dns"
 )
@@ -89,10 +88,8 @@ func DNSRRParser(rr dns.RR) (DNSRRHeader, error) {
 }
 
 // DNSParser parses a DNS header
-func DNSParser(layer gopacket.Layer) (DNSHeader, error) {
+func DNSParser(dnsLayer layers.DNS) (DNSHeader, error) {
 	dnsFlags := make([]string, 0, 8)
-
-	dnsLayer := layer.(*layers.DNS)
 
 	contents := dnsLayer.BaseLayer.LayerContents()
 

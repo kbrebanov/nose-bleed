@@ -1,19 +1,16 @@
 nose-bleed
 ==========
 
-Go network packet sniffer
+Go DNS network packet sniffer
 
 Description
 ===========
 
-**nose-bleed** is a network packet sniffer that outputs the parsed headers in JSON to standard
-output or to a RabbitMQ exchange.
+**nose-bleed** is a DNS network packet sniffer that outputs the parsed headers in JSON to standard output or to a RabbitMQ exchange.
 
 It currently parses the following:
 
   - Ethernet
-  - ICMPv4
-  - ICMPv6
   - IPv4
   - IPv6
   - UDP
@@ -98,8 +95,6 @@ To do
 - [x] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs
 - [x] Godeps
-- [ ] Parse IPv4 options
 - [ ] Parse TCP options
 - [x] Support IPv6
-- [ ] Parse ICMPv6 type bytes
 - [ ] Parse IPv6 hop by hop

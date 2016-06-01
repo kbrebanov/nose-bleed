@@ -14,6 +14,7 @@ import (
 	"github.com/kbrebanov/nose-bleed/parser"
 
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"github.com/streadway/amqp"
 )
@@ -74,11 +75,24 @@ func failOnError(err error, msg string) {
 func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Duration,
 	filter string, settings *Settings) {
 
-	var ch *amqp.Channel
-	var conn *amqp.Connection
-	var vhost string
+	var (
+		ch          *amqp.Channel
+		conn        *amqp.Connection
+		vhost       string
+		useRabbitMQ bool
+	)
 
-	useRabbitMQ := false
+	packetLayers := parser.PacketLayers{}
+
+	decoder := gopacket.NewDecodingLayerParser(
+		layers.LayerTypeEthernet,
+		&packetLayers.EthernetLayer,
+		&packetLayers.IPv4Layer,
+		&packetLayers.IPv6Layer,
+		&packetLayers.UDPLayer,
+		&packetLayers.TCPLayer,
+		&packetLayers.DNSLayer,
+	)
 
 	if settings.RabbitMQ.User != "" && settings.RabbitMQ.Password != "" && settings.RabbitMQ.Host != "" &&
 		settings.RabbitMQ.Exchange.Name != "" && settings.RabbitMQ.Exchange.Type != "" {
@@ -162,9 +176,14 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	}
 
 	// Parse each packet
-	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-	for packet := range packetSource.Packets() {
-		headers, err := parser.Parse(packet)
+	for {
+		packetData, packetMetaData, err := handle.ZeroCopyReadPacketData()
+		if err != nil {
+			log.Println("Failed to get packet", err)
+			continue
+		}
+
+		headers, err := parser.Parse(packetData, packetMetaData, decoder, &packetLayers)
 		if err != nil {
 			log.Println("Failed to parse packet:", err)
 		}

@@ -4,10 +4,7 @@ different TCP/IP network protocol headers.
 */
 package protocols
 
-import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-)
+import "github.com/google/gopacket/layers"
 
 type EthernetHeader struct {
 	SourceAddress string `json:"source_address"`
@@ -17,8 +14,7 @@ type EthernetHeader struct {
 }
 
 // EthernetParser parses an Ethernet frame header
-func EthernetParser(layer gopacket.Layer) EthernetHeader {
-	ethernet := layer.(*layers.Ethernet)
+func EthernetParser(ethernet layers.Ethernet) EthernetHeader {
 
 	ethernetHeader := EthernetHeader{
 		SourceAddress: ethernet.SrcMAC.String(),

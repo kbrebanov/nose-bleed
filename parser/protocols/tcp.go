@@ -1,9 +1,6 @@
 package protocols
 
-import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-)
+import "github.com/google/gopacket/layers"
 
 type TCPHeader struct {
 	SourcePort     int      `json:"source_port"`
@@ -19,10 +16,8 @@ type TCPHeader struct {
 }
 
 // TCPParser parses a TCP segment header
-func TCPParser(layer gopacket.Layer) TCPHeader {
+func TCPParser(tcp layers.TCP) TCPHeader {
 	tcpFlags := make([]string, 0, 9)
-
-	tcp := layer.(*layers.TCP)
 
 	if tcp.FIN {
 		tcpFlags = append(tcpFlags, "FIN")

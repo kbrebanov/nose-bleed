@@ -1,9 +1,6 @@
 package protocols
 
-import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-)
+import "github.com/google/gopacket/layers"
 
 type UDPHeader struct {
 	SourcePort int `json:"source_port"`
@@ -13,8 +10,7 @@ type UDPHeader struct {
 }
 
 // UDPParser parses a UDP datagram header
-func UDPParser(layer gopacket.Layer) UDPHeader {
-	udp := layer.(*layers.UDP)
+func UDPParser(udp layers.UDP) UDPHeader {
 
 	udpHeader := UDPHeader{
 		SourcePort: int(udp.SrcPort),

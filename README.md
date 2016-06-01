@@ -60,6 +60,7 @@ Sending to a RabbitMQ exchange
     "password": "guest",
     "host": "localhost",
     "port": 5672,
+    "vhost": "",
     "tls": {
       "enabled": false,
       "ca_cert_file": "",
@@ -93,7 +94,6 @@ To do
 - [ ] Add tests
 - [ ] Add comments/docs
 - [x] Improve error handling
-- [ ] Support more message brokers other than RabbitMQ
 - [x] Support RabbitMQ TLS connections
 - [x] Support specifying RabbitMQ exchange properties
 - [x] Support BPFs

@@ -30,6 +30,21 @@ type DNSQuestion struct {
 	Qclass string `json:"class"`
 }
 
+type DNSedns struct {
+	Version int    `json:"edns_version"`
+	Flags   string `json:"edns_flags"`
+	UDPSize int    `json:"edns_udp_size"`
+	NSID    string `json:"edns_nsid,omitempty"`
+	Subnet  string `json:"edns_subnet,omitempty"`
+	Cookie  string `json:"edns_cookie,omitempty"`
+	UL      string `json:"edns_ul,omitempty"`
+	LLQ     string `json:"edns_llq,omitempty"`
+	DAU     string `json:"edns_dau,omitempty"`
+	DHU     string `json:"edns_dhu,omitempty"`
+	N3U     string `json:"edns_n3u,omitempty"`
+	Local   string `json:"edns_local,omitempty"`
+}
+
 type DNSRRHeader struct {
 	Name     string `json:"name"`
 	Rrtype   string `json:"type"`
@@ -37,17 +52,68 @@ type DNSRRHeader struct {
 	TTL      int    `json:"ttl"`
 	Rdlength int    `json:"rdata_length"`
 	Rdata    string `json:"rdata"`
+	*DNSedns `json:",omitempty"`
 }
 
 // DNSRRParser parses DNS Resource Records
 func DNSRRParser(rr dns.RR) (DNSRRHeader, error) {
 	var (
+		rrHeader                   []string
 		name, rrType, class, rdata string
 		ttl, rdLength              int
+		edns                       *DNSedns
 	)
 
-	// Get string representation of RR header and split it on tabs
-	rrHeader := strings.Split(rr.String(), "\t")
+	// Setting the struct to nil ensures it won't be marshalled if it's empty
+	edns = nil
+
+	switch rr := rr.(type) {
+	case *dns.OPT:
+		edns = new(DNSedns)
+
+		rrHeader = strings.Split(rr.Header().String(), "\t")
+
+		// Get EDNS version
+		edns.Version = int(rr.Version())
+
+		// Get EDNS flags
+		if rr.Do() {
+			edns.Flags = "do"
+		}
+
+		// Get EDNS UDP Size
+		edns.UDPSize = int(rr.UDPSize())
+
+		// Get string representation of each option
+		options := strings.Split(rr.String(), "\n")[2:]
+		for _, opt := range options {
+			opt = strings.TrimPrefix(opt, "; ")
+
+			if strings.HasPrefix(opt, "NSID") {
+				edns.NSID = strings.TrimPrefix(opt, "NSID: ")
+			} else if strings.HasPrefix(opt, "SUBNET") {
+				edns.Subnet = strings.TrimPrefix(opt, "SUBNET: ")
+			} else if strings.HasPrefix(opt, "COOKIE") {
+				edns.Cookie = strings.TrimPrefix(opt, "COOKIE: ")
+			} else if strings.HasPrefix(opt, "UPDATE LEASE") {
+				edns.UL = strings.TrimPrefix(opt, "UPDATE LEASE: ")
+			} else if strings.HasPrefix(opt, "LONG LIVED QUERIES") {
+				edns.LLQ = strings.TrimPrefix(opt, "LONG LIVED QUERIES: ")
+			} else if strings.HasPrefix(opt, "DNSSEC ALGORITHM UNDERSTOOD") {
+				edns.DAU = strings.TrimPrefix(opt, "DNSSEC ALGORITHM UNDERSTOOD: ")
+			} else if strings.HasPrefix(opt, "DS HASH UNDERSTOOD") {
+				edns.DHU = strings.TrimPrefix(opt, "DS HASH UNDERSTOOD: ")
+			} else if strings.HasPrefix(opt, "NSEC3 HASH UNDERSTOOD") {
+				edns.N3U = strings.TrimPrefix(opt, "NSEC3 HASH UNDERSTOOD: ")
+			} else if strings.HasPrefix(opt, "LOCAL OPT") {
+				edns.Local = strings.TrimPrefix(opt, "LOCAL OPT: ")
+			}
+		}
+	// Any RR other than OPT
+	default:
+		// Get string representation of RR header and split it on tabs
+		rrHeader = strings.Split(rr.String(), "\t")
+	}
 
 	// Extract respective fields from RR header
 	headerLen := len(rrHeader)
@@ -83,6 +149,7 @@ func DNSRRParser(rr dns.RR) (DNSRRHeader, error) {
 		TTL:      ttl,
 		Rdlength: rdLength,
 		Rdata:    rdata,
+		DNSedns:  edns,
 	}
 
 	return header, nil
@@ -148,44 +215,29 @@ func DNSParser(layer gopacket.Layer) (DNSHeader, error) {
 
 	// Parse answer resource records
 	for _, answer := range dnsMsg.Answer {
-		switch answer := answer.(type) {
-		case *dns.OPT: // Skip OPT RRs
-			continue
-		default:
-			rr, err := DNSRRParser(answer)
-			if err != nil {
-				return DNSHeader{}, err
-			}
-			dnsAnswerRRS = append(dnsAnswerRRS, rr)
+		rr, err := DNSRRParser(answer)
+		if err != nil {
+			return DNSHeader{}, err
 		}
+		dnsAnswerRRS = append(dnsAnswerRRS, rr)
 	}
 
 	// Parse authority resource records
 	for _, authority := range dnsMsg.Ns {
-		switch authority := authority.(type) {
-		case *dns.OPT: // Skip OPT RRs
-			continue
-		default:
-			rr, err := DNSRRParser(authority)
-			if err != nil {
-				return DNSHeader{}, err
-			}
-			dnsAuthorityRRS = append(dnsAuthorityRRS, rr)
+		rr, err := DNSRRParser(authority)
+		if err != nil {
+			return DNSHeader{}, err
 		}
+		dnsAuthorityRRS = append(dnsAuthorityRRS, rr)
 	}
 
 	// Parse additional resource records
 	for _, additional := range dnsMsg.Extra {
-		switch additional := additional.(type) {
-		case *dns.OPT: // Skip OPT RRs
-			continue
-		default:
-			rr, err := DNSRRParser(additional)
-			if err != nil {
-				return DNSHeader{}, err
-			}
-			dnsAdditionalRRS = append(dnsAdditionalRRS, rr)
+		rr, err := DNSRRParser(additional)
+		if err != nil {
+			return DNSHeader{}, err
 		}
+		dnsAdditionalRRS = append(dnsAdditionalRRS, rr)
 	}
 
 	dnsHeader := DNSHeader{

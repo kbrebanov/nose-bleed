@@ -166,13 +166,13 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 	for packet := range packetSource.Packets() {
 		headers, err := parser.Parse(packet)
 		if err != nil {
-			log.Println("Failed to parse packet:", err)
+			log.Println("Failed to parse packet:", err, packet)
 		}
 
 		if useRabbitMQ {
 			b, err := json.Marshal(headers)
 			if err != nil {
-				log.Println("Failed to marshal packet to JSON:", err)
+				log.Println("Failed to marshal packet to JSON:", err, packet)
 				// Skip packet if JSON marshalling errors
 				continue
 			}
@@ -191,7 +191,7 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 			// Pretty print JSON when sending to standard output
 			b, err := json.MarshalIndent(headers, "", "  ")
 			if err != nil {
-				log.Println("Failed to marshal packet to JSON:", err)
+				log.Println("Failed to marshal packet to JSON:", err, packet)
 				// Skip packet if JSON marshalling errors
 				continue
 			}

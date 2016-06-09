@@ -22,9 +22,10 @@ const version string = "0.4.0"
 
 // RabbitMQPublishSettings is a structure for RabbitMQ publish settings
 type RabbitMQPublishSettings struct {
-	Key       string `json:"key"`
-	Mandatory bool   `json:"mandatory"`
-	Immediate bool   `json:"immediate"`
+	Key        string `json:"key"`
+	Mandatory  bool   `json:"mandatory"`
+	Immediate  bool   `json:"immediate"`
+	Persistent bool   `json:"persistent"`
 }
 
 // RabbitMQExchangeSettings is a structure for RabbitMQ exchange settings
@@ -170,6 +171,13 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 		}
 
 		if useRabbitMQ {
+			// Set message to be non-persistent by default
+			var deliveryMode uint8 = 1
+
+			if settings.RabbitMQ.Publish.Persistent {
+				deliveryMode = 2
+			}
+
 			b, err := json.Marshal(headers)
 			if err != nil {
 				log.Println("Failed to marshal packet to JSON:", err, packet)
@@ -183,8 +191,9 @@ func sniff(deviceName string, snapshotLen int, promiscuous bool, timeout time.Du
 				settings.RabbitMQ.Publish.Mandatory,
 				settings.RabbitMQ.Publish.Immediate,
 				amqp.Publishing{
-					ContentType: "text/json",
-					Body:        b,
+					ContentType:  "text/json",
+					DeliveryMode: deliveryMode,
+					Body:         b,
 				})
 			failOnError(err, "Failed to publish a message")
 		} else {

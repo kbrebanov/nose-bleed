@@ -22,7 +22,8 @@
     "publish": {
       "key": "",
       "mandatory": false,
-      "immediate": false
+      "immediate": false,
+      "peristent": false
     }
   }
 }

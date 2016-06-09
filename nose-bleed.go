@@ -18,7 +18,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const version string = "0.4.0"
+const version string = "0.5.0"
 
 // RabbitMQPublishSettings is a structure for RabbitMQ publish settings
 type RabbitMQPublishSettings struct {

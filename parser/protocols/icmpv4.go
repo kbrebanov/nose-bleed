@@ -5,6 +5,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// ICMPv4Header repesents and ICMPv4 header
 type ICMPv4Header struct {
 	Type           int `json:"type"`
 	Code           int `json:"code"`

@@ -9,6 +9,7 @@ import (
 	"github.com/miekg/dns"
 )
 
+// DNSHeader represents a DNS header
 type DNSHeader struct {
 	ID                 int           `json:"id"`
 	Opcode             string        `json:"opcode"`
@@ -24,12 +25,14 @@ type DNSHeader struct {
 	AdditionalRRS      []interface{} `json:"additional_rrs"`
 }
 
+// DNSQuestion represents a DNS question
 type DNSQuestion struct {
 	Name   string `json:"name"`
 	Qtype  string `json:"type"`
 	Qclass string `json:"class"`
 }
 
+// DNSedns represents EDNS information
 type DNSedns struct {
 	Version int    `json:"edns_version"`
 	Flags   string `json:"edns_flags"`
@@ -45,6 +48,7 @@ type DNSedns struct {
 	Local   string `json:"edns_local,omitempty"`
 }
 
+// DNSRRHeader represents a DNS Resource Record
 type DNSRRHeader struct {
 	Name     string `json:"name"`
 	Rrtype   string `json:"type"`

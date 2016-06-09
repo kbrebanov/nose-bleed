@@ -5,6 +5,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// TCPHeader repesents a TCP segment header
 type TCPHeader struct {
 	SourcePort     int      `json:"source_port"`
 	DestPort       int      `json:"destination_port"`

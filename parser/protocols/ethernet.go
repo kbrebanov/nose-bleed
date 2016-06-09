@@ -9,6 +9,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// EthernetHeader represents and Ethernet frame header
 type EthernetHeader struct {
 	SourceAddress string `json:"source_address"`
 	DestAddress   string `json:"destination_address"`

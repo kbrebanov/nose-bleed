@@ -5,6 +5,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// IPv4Header repesents an IPv4 packet header
 type IPv4Header struct {
 	Version        int      `json:"version"`
 	IHL            int      `json:"header_length"`

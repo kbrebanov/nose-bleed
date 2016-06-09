@@ -5,6 +5,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// UDPHeader repesents a UDP datagram header
 type UDPHeader struct {
 	SourcePort int `json:"source_port"`
 	DestPort   int `json:"destination_port"`

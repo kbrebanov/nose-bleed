@@ -5,6 +5,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+// IPv6Header represents an IPv6 packet header
 type IPv6Header struct {
 	Version       int    `json:"version"`
 	TrafficClass  int    `json:"traffic_class"`

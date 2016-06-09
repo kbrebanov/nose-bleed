@@ -23,7 +23,7 @@
       "key": "",
       "mandatory": false,
       "immediate": false,
-      "peristent": false
+      "persistent": false
     }
   }
 }

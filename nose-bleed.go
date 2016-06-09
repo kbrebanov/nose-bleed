@@ -215,7 +215,7 @@ func main() {
 	device := flag.String("device", "eth0", "Device to sniff")
 	snaplen := flag.Int("snaplen", 65535, "Snapshot length")
 	promiscuous := flag.Bool("promiscuous", false, "Set promiscuous mode")
-	timeout := flag.Duration("timeout", 30*time.Second, "Timeout")
+	timeout := flag.Duration("timeout", pcap.BlockForever, "Timeout")
 	filter := flag.String("filter", "", "Berkley Packet Filter (BPF)")
 	showVersion := flag.Bool("version", false, "Show version")
 	logFilePath := flag.String("log", "./nose-bleed.log", "Path to log file")

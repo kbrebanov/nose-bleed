@@ -1,0 +1,6 @@
+github.com/google/gopacket v0.0.0-20160306213541-8cdd14ca4735 h1:QIBb3HITUq4Dxk+8fHn03dIi3Irb1cSHTkv+QcCS7hA=
+github.com/google/gopacket v0.0.0-20160306213541-8cdd14ca4735/go.mod h1:UCLx9mCmAwsVbn6qQl1WIEt2SO7Nd2fD0th1TBAsqBw=
+github.com/miekg/dns v0.0.0-20160308070806-b9171237b064 h1:7mUfYX3SrBDqu6yUqvbfv0oZ3kbbxic9OHXrcOZQXA0=
+github.com/miekg/dns v0.0.0-20160308070806-b9171237b064/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
+github.com/streadway/amqp v0.0.0-20160311215503-2e25825abdbd h1:625/bJvSNfQrzzK5ttnUqMqnVe8M5MILmf5ZRGgeeDY=
+github.com/streadway/amqp v0.0.0-20160311215503-2e25825abdbd/go.mod h1:1WNBiOZtZQLpVAyu0iTduoJL9hEsMloAK5XWrtW0xdY=

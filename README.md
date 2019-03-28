@@ -25,13 +25,6 @@ Dependencies
 
 - libpcap-dev
 
-```bash
-go get github.com/tools/godep
-
-cd $GOPATH/src/github.com/kbrebanov/nose-bleed
-godep restore
-```
-
 Build
 =====
 
@@ -93,13 +86,7 @@ To do
 =====
 - [ ] Add tests
 - [ ] Add comments/docs
-- [x] Improve error handling
-- [x] Support RabbitMQ TLS connections
-- [x] Support specifying RabbitMQ exchange properties
-- [x] Support BPFs
-- [x] Godeps
 - [ ] Parse IPv4 options
 - [ ] Parse TCP options
-- [x] Support IPv6
 - [ ] Parse ICMPv6 type bytes
 - [ ] Parse IPv6 hop by hop
